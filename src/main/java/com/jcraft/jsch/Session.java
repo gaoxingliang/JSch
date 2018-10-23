@@ -1,6 +1,6 @@
 /* -*-mode:java; c-basic-offset:2; indent-tabs-mode:nil -*- */
 /*
-Copyright (c) 2002-2016 ymnk, JCraft,Inc. All rights reserved.
+Copyright (c) 2002-2015 ymnk, JCraft,Inc. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -126,7 +126,7 @@ public class Session implements Runnable {
     SocketFactory socket_factory = null;
 
     static final int buffer_margin = 32 + // maximum padding length
-            64 + // maximum mac length
+            20 + // maximum mac length
             32;  // margin for deflater; deflater may inflate data
 
     private java.util.Hashtable config = null;
@@ -345,15 +345,10 @@ public class Session implements Runnable {
             }
 
             try {
-                long tmp = System.currentTimeMillis();
-                in_prompt = true;
                 checkHost(host, port, kex);
-                in_prompt = false;
-                kex_start_time += (System.currentTimeMillis() - tmp);
             }
             catch (JSchException ee) {
                 in_kex = false;
-                in_prompt = false;
                 throw ee;
             }
 
@@ -620,7 +615,6 @@ public class Session implements Runnable {
     }
 
     private volatile boolean in_kex = false;
-    private volatile boolean in_prompt = false;
 
     public void rekey() throws Exception {
         send_kexinit();
@@ -1277,7 +1271,7 @@ public class Session implements Runnable {
         while (true) {
             if (in_kex) {
                 if (t > 0L && (System.currentTimeMillis() - kex_start_time) > t) {
-                    throw new JSchException("timeout in waiting for rekeying process.");
+                    throw new JSchException("timeout in wating for rekeying process.");
                 }
                 try {
                     Thread.sleep(10);
@@ -1373,11 +1367,8 @@ public class Session implements Runnable {
         // System.err.println("in_kex="+in_kex+" "+(packet.buffer.getCommand()));
         long t = getTimeout();
         while (in_kex) {
-            if (t > 0L &&
-                    (System.currentTimeMillis() - kex_start_time) > t &&
-                    !in_prompt
-            ) {
-                throw new JSchException("timeout in waiting for rekeying process.");
+            if (t > 0L && (System.currentTimeMillis() - kex_start_time) > t) {
+                throw new JSchException("timeout in wating for rekeying process.");
             }
             byte command = packet.buffer.getCommand();
             //System.err.println("command: "+command);
