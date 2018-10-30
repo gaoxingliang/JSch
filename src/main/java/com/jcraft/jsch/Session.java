@@ -129,6 +129,12 @@ public class Session implements Runnable {
             64 + // maximum mac length
             32;  // margin for deflater; deflater may inflate data
 
+    // in some cisco devices, the buffer is not so large
+    static final int buffer_margin_cisco = 32 + // maximum padding length
+            20 + // maximum mac length
+            32;  // margin for deflater; deflater may inflate data
+
+
     private java.util.Hashtable config = null;
 
     private Proxy proxy = null;
