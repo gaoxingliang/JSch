@@ -251,10 +251,11 @@ public abstract class Channel implements Runnable {
                 packet = new Packet(buffer);
 
                 byte[] _buf = buffer.buffer;
-                if (_buf.length - (14 + 0) - Session.buffer_margin <= 0) {
+                int margin = Session.buffer_margin_cisco;
+                if (_buf.length - (14 + 0) - margin <= 0) {
                     buffer = null;
                     packet = null;
-                    throw new IOException("failed to initialize the channel.");
+                    throw new IOException(String.format("failed to initialize the channel (remote maximum packet size %d, margin %d) ", rmpsize, margin));
                 }
 
             }
@@ -279,8 +280,8 @@ public abstract class Channel implements Runnable {
                 int _bufl = _buf.length;
                 while (l > 0) {
                     int _l = l;
-                    if (l > _bufl - (14 + dataLen) - Session.buffer_margin) {
-                        _l = _bufl - (14 + dataLen) - Session.buffer_margin;
+                    if (l > _bufl - (14 + dataLen) - Session.buffer_margin_cisco) {
+                        _l = _bufl - (14 + dataLen) - Session.buffer_margin_cisco;
                     }
 
                     if (_l <= 0) {
