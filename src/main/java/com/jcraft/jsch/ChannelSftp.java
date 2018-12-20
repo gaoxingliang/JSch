@@ -955,6 +955,15 @@ public class ChannelSftp extends ChannelSession {
                     if (i == -1) dstsb.append(_src);
                     else dstsb.append(_src.substring(i + 1));
                     _dst = dstsb.toString();
+                    if (_dst.indexOf("..") != -1) {
+                        String dstc = (new java.io.File(dst)).getCanonicalPath();
+                        String _dstc = (new java.io.File(_dst)).getCanonicalPath();
+                        if (!(_dstc.length() > dstc.length() &&
+                                _dstc.substring(0, dstc.length() + 1).equals(dstc + file_separator))) {
+                            throw new SftpException(SSH_FX_FAILURE,
+                                    "writing to an unexpected file " + _src);
+                        }
+                    }
                     dstsb.delete(dst.length(), _dst.length());
                 }
                 else {
