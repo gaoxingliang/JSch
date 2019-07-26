@@ -78,6 +78,7 @@ public class JSch {
 
         config.put("ecdh-sha2-nistp", "com.jcraft.jsch.jce.ECDHN");
 
+        config.put(com.jcraft.jsch.jce.DH.KEY_BOUNCY_CASTLE_ENABLE, "true");
         config.put("dh", "com.jcraft.jsch.jce.DH");
         config.put("3des-cbc", "com.jcraft.jsch.jce.TripleDESCBC");
         config.put("blowfish-cbc", "com.jcraft.jsch.jce.BlowfishCBC");
