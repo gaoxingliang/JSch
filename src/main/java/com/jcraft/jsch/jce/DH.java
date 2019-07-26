@@ -29,6 +29,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package com.jcraft.jsch.jce;
 
+import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 
 import javax.crypto.KeyAgreement;
@@ -41,6 +42,9 @@ import java.security.KeyPairGenerator;
 import java.security.PublicKey;
 
 public class DH implements com.jcraft.jsch.DH {
+
+    public static final String KEY_BOUNCY_CASTLE_ENABLE = "dh.bouncycastle.enable";
+
     BigInteger p;
     BigInteger g;
     BigInteger e;  // my public key
@@ -53,7 +57,12 @@ public class DH implements com.jcraft.jsch.DH {
     private KeyAgreement myKeyAgree;
 
     public void init() throws Exception {
-        myKpairGen = KeyPairGenerator.getInstance("DH");
+        if ("TRUE".equalsIgnoreCase(JSch.getConfig(KEY_BOUNCY_CASTLE_ENABLE))) {
+            myKpairGen = new org.bouncycastle.jce.provider.JDKKeyPairGenerator.DH();
+        }
+        else {
+            myKpairGen = KeyPairGenerator.getInstance("DH");
+        }
         myKeyAgree = KeyAgreement.getInstance("DH");
     }
 
